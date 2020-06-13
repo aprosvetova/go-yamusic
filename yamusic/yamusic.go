@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/google/uuid"
 	"io"
 	"log"
 	"net/http"
@@ -31,6 +32,8 @@ type (
 		userID      int
 		// Services
 		genres    *GenresService
+		queues    *QueuesService
+		tracks    *TracksService
 		search    *SearchService
 		account   *AccountService
 		feed      *FeedService
@@ -53,6 +56,8 @@ func NewClient(options ...func(*Client)) *Client {
 	}
 
 	c.genres = &GenresService{client: c}
+	c.queues = &QueuesService{client: c}
+	c.tracks = &TracksService{client: c}
 	c.search = &SearchService{client: c}
 	c.account = &AccountService{client: c}
 	c.feed = &FeedService{client: c}
@@ -135,6 +140,9 @@ func (c *Client) NewRequest(
 		return nil, err
 	}
 
+	uid := uuid.New().String()
+
+	req.Header.Set("X-Yandex-Music-Device", "os=iOS; os_version=13.3.1; manufacturer=Apple; model=iPhone10,4; clid=0; device_id="+uid+"; uuid="+uid+"; mcc=257; mnc=02")
 	req.Header.Set("Authorization", "OAuth "+c.accessToken)
 	if isForm && method == http.MethodPost {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -193,6 +201,16 @@ func (c *Client) UserID() int {
 // Genres returns genres service
 func (c *Client) Genres() *GenresService {
 	return c.genres
+}
+
+// Queues returns queues service
+func (c *Client) Queues() *QueuesService {
+	return c.queues
+}
+
+// Tracks returns tracks service
+func (c *Client) Tracks() *TracksService {
+	return c.tracks
 }
 
 // Search returns genres service
