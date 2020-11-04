@@ -1,4 +1,4 @@
-module github.com/ndrewnee/go-yamusic
+module github.com/aprosvetova/go-yamusic
 
 go 1.14
 
